@@ -1,0 +1,142 @@
+{
+    "pipeline": {
+        "name": "devop-labs",
+        "roleArn": "arn:aws:iam::582726398736:role/service-role/AWSCodePipelineServiceRole-us-east-1-devop-labs",
+        "artifactStore": {
+            "type": "S3",
+            "location": "codepipeline-us-east-1-ae6136eeac8f-4bbc-b6ce-1367c7d28406"
+        },
+        "stages": [
+            {
+                "name": "Source",
+                "actions": [
+                    {
+                        "name": "Source",
+                        "actionTypeId": {
+                            "category": "Source",
+                            "owner": "AWS",
+                            "provider": "CodeStarSourceConnection",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "BranchName": "main",
+                            "ConnectionArn": "arn:aws:codeconnections:us-east-1:582726398736:connection/42dcf9c0-9d8e-41f9-91c2-0a1c946411aa",
+                            "DetectChanges": "true",
+                            "FullRepositoryId": "math-ade/devop-labs",
+                            "OutputArtifactFormat": "CODE_ZIP"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "inputArtifacts": [],
+                        "region": "us-east-1",
+                        "namespace": "SourceVariables"
+                    }
+                ],
+                "onFailure": {
+                    "result": "RETRY",
+                    "retryConfiguration": {
+                        "retryMode": "ALL_ACTIONS"
+                    }
+                }
+            },
+            {
+                "name": "build",
+                "actions": [
+                    {
+                        "name": "build",
+                        "actionTypeId": {
+                            "category": "Build",
+                            "owner": "AWS",
+                            "provider": "CodeBuild",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "ProjectName": "devop-builds"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "region": "us-east-1"
+                    }
+                ]
+            },
+            {
+                "name": "Deploy",
+                "actions": [
+                    {
+                        "name": "Approval",
+                        "actionTypeId": {
+                            "category": "Approval",
+                            "owner": "AWS",
+                            "provider": "Manual",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {},
+                        "outputArtifacts": [],
+                        "inputArtifacts": [],
+                        "region": "us-east-1"
+                    },
+                    {
+                        "name": "Deploy",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "ElasticBeanstalk",
+                            "version": "1"
+                        },
+                        "runOrder": 2,
+                        "configuration": {
+                            "ApplicationName": "devop-labs",
+                            "EnvironmentName": "Devop-labs-env"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "region": "us-east-1",
+                        "namespace": "DeployVariables"
+                    }
+                ],
+                "onFailure": {
+                    "result": "ROLLBACK"
+                }
+            }
+        ],
+        "version": 2,
+        "executionMode": "QUEUED",
+        "pipelineType": "V2",
+        "triggers": [
+            {
+                "providerType": "CodeStarSourceConnection",
+                "gitConfiguration": {
+                    "sourceActionName": "Source",
+                    "push": [
+                        {
+                            "branches": {
+                                "includes": [
+                                    "main"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "pipelineArn": "arn:aws:codepipeline:us-east-1:582726398736:devop-labs",
+        "created": "2026-02-25T22:20:05.163000+00:00",
+        "updated": "2026-02-26T00:35:18.841000+00:00"
+    }
+}

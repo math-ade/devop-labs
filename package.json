@@ -1,9 +1,12 @@
 {
-  "name": "Elastic-Beanstalk-Sample-App",
-  "version": "0.0.1",
-  "private": true,
-  "dependencies": {},
+  "name": "nodejs-blue",
+  "version": "1.0.0",
+  "main": "index.js",
   "scripts": {
-    "start": "node app.js"
-  }
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
